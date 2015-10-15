@@ -10,11 +10,15 @@
   [data-point-num & coefficients]
   (nth (iterate
         #(let [n (count coefficients)
-               x-vec (repeatedly n (fn [] (Math/random)))]
-           (assoc %1 x-vec (apply + (map * x-vec coefficients))))
-        {})
-       data-point-num))
+               ;;x-vec:: (1, x1, x2, ..., xn  
+               x-vec (->> (fn [] Math/random)
+                          (repeatedly (dec n))
+                          (cons 1))] 
+           (->> (map * x-vec coefficients)
+                (apply +)
+                (assoc %1 x-vec))) {}) data-point-num))
 
+;NOTE: The first element of the feature vec should be 1 so coefficient sub 0 is independent of any x
 (defn hypothesis-fn
   "Builds the hypothesis function h(x) using a vector theta of coefficients"
   [param-vec]
@@ -42,3 +46,15 @@
             (reduce 0 data)
             (Math/pow 2)
             (* coefficient))))))
+
+(take 10 (iterate #(int (/ % 2.0)) 321))
+
+(defn int->bin [x]
+  (loop [num x
+         bin ""]
+    (let [new-bin (str bin (mod num 2))
+          half (int (/ num 2.0))]
+      (if (#{0 1} half)
+        (str new-bin (mod half 2))
+        (recur half
+               new-bin)))))
